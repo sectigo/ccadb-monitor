@@ -49,5 +49,3 @@ jobs:
         run: php artisan verify:urls:cpcps --caowner="${{ github.event.inputs.caowner }}"
         env:
           APP_ENV: production
-          CCADB_ALL_CERTIFICATE_RECORDS_URL: ${{ secrets.CCADB_ALL_CERTIFICATE_RECORDS_URL }}
-          HTTP_USER_AGENT: ${{ secrets.HTTP_USER_AGENT }}
