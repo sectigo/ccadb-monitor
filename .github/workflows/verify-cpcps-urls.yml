@@ -6,7 +6,7 @@ on:
       caowner:
         description: 'CA Owner to verify'
         required: true
-        default: 'Sectigo'
+        default: ''
 
 jobs:
   verify-cpcps-urls:
@@ -46,6 +46,6 @@ jobs:
           APP_ENV: production
 
       - name: Run URL verification
-        run: php artisan verify:urls:cpcps --caowner="${{ github.event.inputs.caowner }}"
+        run: php artisan verify:urls:cpcps --caowner="${{ github.event.inputs.caowner }}" --mode=Standalone
         env:
           APP_ENV: production
