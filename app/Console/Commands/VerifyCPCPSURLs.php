@@ -16,14 +16,20 @@ class VerifyCPCPSURLs extends Command
      * @var string
      */
     protected $signature = 'verify:urls:cpcps
-    {--caowner= : Run for a specific CA Owner}';
+    {--caowner= : Run for a specific CA Owner}
+    {--mode= : Standalone or Integrated}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Run verification for CP, CPS and Combined CP/CPS documents for the specified CA Owner.';
+    protected $description = 'Run verification for CP, CPS and Combined CP/CPS documents for the specified CA Owner.
+
+    Specify the --caowner option (required).
+    Specify the --mode option:
+    - Standalone: Run as a standalone command (default behavior), loading a new copy from CCADB upon runtime. Results and errors are only logged through the logging stack
+    - Integrated (default): Run as part of a database-backed installation, reusing the most recent CCADB data currently available in the database. Results and errors are logged through the logging stack and also stored in the database for reporting and usage within the WebUI.';
 
     /**
      * Fields to check for URLs in CCADB records.
@@ -49,18 +55,19 @@ class VerifyCPCPSURLs extends Command
 
         // Proceed with normal execution when only --caowner is provided
         $caOwner = $this->option('caowner');
+        $mode = $this->option('mode') ?? 'Integrated';
 
         // Fetch matching CCADB certificate records for the given CA Owner
         try {
             $ccadb = new CCADB();
-            $records = $ccadb->getAllCertificateRecordsByOwner($caOwner);
+            $records = $ccadb->getAllCertificateRecordsByOwner($caOwner, $mode);
         } catch (\Throwable $e) {
             $this->error('Failed to retrieve CCADB records: ' . $e->getMessage());
             return 1;
         }
 
         // Sanitize: discard revoked/parent-revoked and expired (>=1 day past) records
-        $records = $this->sanitizeRecords($records);
+        $records = $ccadb->disregardExpiredAndRevokedCertificates($records);
 
         // Display a brief summary and count
         $count = count($records);
@@ -155,34 +162,6 @@ class VerifyCPCPSURLs extends Command
     }
 
     /**
-     * Remove records where:
-     * - Revocation Status is 'Revoked' or 'Parent Cert Revoked'
-     * - Valid To (GMT), parsed strictly as M/D/Y (UTC end-of-day), is at least 1 day in the past (<= now(UTC) - 1 day)
-     */
-    private function sanitizeRecords(array $records): array
-    {
-        $threshold = Carbon::now('UTC')->subDay();
-
-        $filtered = [];
-        foreach ($records as $row) {
-            $status = isset($row['Revocation Status']) ? trim((string) $row['Revocation Status']) : '';
-            $statusLower = mb_strtolower($status);
-            if ($statusLower === 'revoked' || $statusLower === 'parent cert revoked') {
-                continue; // disregard revoked
-            }
-
-            $validTo = Carbon::createFromFormat('Y.m.d', $row['Valid To (GMT)'], 'UTC');
-            if ($validTo !== null && $validTo->lessThanOrEqualTo($threshold)) {
-                continue; // disregard expired >= 1 day ago
-            }
-
-            $filtered[] = $row;
-        }
-
-        return array_values($filtered);
-    }
-
-    /**
      * Validate options and show help + error when invalid.
      * Returns true when help was shown (and execution should stop).
      */
@@ -195,10 +174,8 @@ class VerifyCPCPSURLs extends Command
 
         // Determine if --caowner is present with a non-empty value and is the only option
         $hasCaOwner = array_key_exists('caowner', $options) && $options['caowner'] !== '';
-        $hasOnlyCaOwner = $hasCaOwner && count($options) === 1;
 
-        // Enforce that --caowner is required and must be the only option; otherwise show help
-        if (!$hasOnlyCaOwner) {
+        if (!$hasCaOwner) {
             $this->error('The --caowner option is required and must be the only option provided.');
             $this->call('help', ['command_name' => $this->getName()]);
             return true;
