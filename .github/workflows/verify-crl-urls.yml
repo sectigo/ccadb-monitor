@@ -11,11 +11,6 @@ on:
 jobs:
   verify-crl-urls:
     runs-on: ubuntu-latest
-    env:
-      LOG_LEVEL: {{ secrets.LOG_LEVEL }}
-      LOG_SLACK_WEBHOOK_URL: {{ secrets.LOG_SLACK_WEBHOOK_URL }}
-      LOG_TEAMS_WEBHOOK_URL: {{ secrets.LOG_TEAMS_WEBHOOK_URL }}
-      LOG_LEVEL: {{ secrets.LOG_LEVEL }}
 
     steps:
       - name: Checkout repository
@@ -54,3 +49,7 @@ jobs:
         run: php artisan verify:urls:crl --caowner="${{ github.event.inputs.caowner }}" --mode=Standalone
         env:
           APP_ENV: production
+          LOG_LEVEL: {{ secrets.LOG_LEVEL }}
+          LOG_SLACK_WEBHOOK_URL: {{ secrets.LOG_SLACK_WEBHOOK_URL }}
+          LOG_TEAMS_WEBHOOK_URL: {{ secrets.LOG_TEAMS_WEBHOOK_URL }}
+          LOG_LEVEL: {{ secrets.LOG_LEVEL }}
