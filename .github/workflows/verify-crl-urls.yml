@@ -1,0 +1,51 @@
+name: Verify CRL URLs
+
+on:
+  workflow_dispatch:
+    inputs:
+      caowner:
+        description: 'CA Owner to verify'
+        required: true
+        default: ''
+
+jobs:
+  verify-cpcps-urls:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup PHP 8.5
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          extensions: mbstring, intl, dom, curl, fileinfo, openssl, pdo, tokenizer, xml
+          coverage: none
+
+      - name: Determine Composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
+
+      - name: Install PHP dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Prepare environment
+        run: cp .env.example .env
+
+      - name: Generate application key
+        run: php artisan key:generate --force
+        env:
+          APP_ENV: production
+
+      - name: Run CRL URL verification
+        run: php artisan verify:urls:crl --caowner="${{ github.event.inputs.caowner }}" --mode=Standalone
+        env:
+          APP_ENV: production
