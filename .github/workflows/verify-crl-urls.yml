@@ -52,4 +52,4 @@ jobs:
           LOG_LEVEL: {{ secrets.LOG_LEVEL }}
           LOG_SLACK_WEBHOOK_URL: {{ secrets.LOG_SLACK_WEBHOOK_URL }}
           LOG_TEAMS_WEBHOOK_URL: {{ secrets.LOG_TEAMS_WEBHOOK_URL }}
-          LOG_LEVEL: {{ secrets.LOG_LEVEL }}
+          LOG_STACK: {{ secrets.LOG_STACK }}
