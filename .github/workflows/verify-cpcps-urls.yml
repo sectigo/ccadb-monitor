@@ -6,7 +6,7 @@ on:
       caowner:
         description: 'CA Owner to verify'
         required: true
-        default: ${{ secrets.CA_OWNER }}
+        default: ''
 
 jobs:
   verify-cpcps-urls:
