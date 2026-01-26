@@ -6,7 +6,7 @@ on:
       caowner:
         description: 'CA Owner to verify'
         required: true
-        default: {{ secrets.CA_OWNER }}
+        default: ${{ secrets.CA_OWNER }}
 
 jobs:
   verify-cpcps-urls:
@@ -49,7 +49,7 @@ jobs:
         run: php artisan verify:urls:cpcps --caowner="${{ github.event.inputs.caowner }}" --mode=Standalone
         env:
           APP_ENV: production
-          LOG_LEVEL: {{ secrets.LOG_LEVEL }}
-          LOG_SLACK_WEBHOOK_URL: {{ secrets.LOG_SLACK_WEBHOOK_URL }}
-          LOG_TEAMS_WEBHOOK_URL: {{ secrets.LOG_TEAMS_WEBHOOK_URL }}
-          LOG_STACK: {{ secrets.LOG_STACK }}
+          LOG_LEVEL: ${{ secrets.LOG_LEVEL }}
+          LOG_SLACK_WEBHOOK_URL: ${{ secrets.LOG_SLACK_WEBHOOK_URL }}
+          LOG_TEAMS_WEBHOOK_URL: ${{ secrets.LOG_TEAMS_WEBHOOK_URL }}
+          LOG_STACK: ${{ secrets.LOG_STACK }}
