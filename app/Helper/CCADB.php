@@ -181,6 +181,7 @@ class CCADB
                 }
 
                 $row = $detailsMap;
+                $row['id'] = $rec->id;
                 $row['CA Owner'] = $rec->ca_owner;
                 $row['Certificate Name'] = $rec->certificate_name;
                 $row['Salesforce Record ID'] = $rec->ccadb_record_id;

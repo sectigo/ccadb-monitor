@@ -10,14 +10,14 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
-class VerifyCPCPSURLs extends Command
+class VerifyCRLURLs extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'verify:urls:cpcps
+    protected $signature = 'verify:urls:crl
     {--caowner= : Run for a specific CA Owner}
     {--mode= : Standalone or Integrated}';
 
@@ -26,7 +26,7 @@ class VerifyCPCPSURLs extends Command
      *
      * @var string
      */
-    protected $description = 'Run verification for CP, CPS and Combined CP/CPS documents for the specified CA Owner.
+    protected $description = 'Run verification for CRLs for the specified CA Owner.
 
     Specify the --caowner option (required).
     Specify the --mode option:
@@ -37,12 +37,8 @@ class VerifyCPCPSURLs extends Command
      * Fields to check for URLs in CCADB records.
      */
     private const URL_FIELDS = [
-        'Certificate Practice Statement (CPS) URL',
-        'Policy Documentation',
-        'CA Document Repository',
-        'Certificate Policy (CP) URL',
-        'Certificate Practice & Policy Statement',
-        'MD/AsciiDoc CP/CPS URL',
+        'Full CRL Issued By This CA',
+        'JSON Array of Partitioned CRLs',
     ];
 
     /**
@@ -75,8 +71,8 @@ class VerifyCPCPSURLs extends Command
         $count = count($records);
         $this->info("Found {$count} certificate record(s) for owner '{$caOwner}'.");
 
-        //If available, discover the last CPS URL check time
-        $lastRun = Setting::where("key", "=", "last_cpcps_url_check")->first()->value ?? 'N/A';
+        //If available, discover the last CRL URL check time
+        $lastRun = Setting::where("key", "=", "last_crl_url_check")->first()->value ?? 'N/A';
 
         // Process URL fields for each record
         foreach ($records as $i => $row) {
@@ -84,10 +80,10 @@ class VerifyCPCPSURLs extends Command
         }
 
         $setting = new Setting();
-        $setting->setLastCRLURLCheckNow();
+        $setting->setLastCPCPSURLCheckNow();
 
-        //Set any CPS URL checks as resolved if they were last detected before the last run
-        foreach( Issue::where("issue_type", "LIKE", "CPS: %")->where("is_resolved", "=", false)->get() as $issue ) {
+        //Set any CRL URL checks as resolved if they were last detected before the last run
+        foreach( Issue::where("issue_type", "LIKE", "CRL: %")->where("is_resolved", "=", false)->get() as $issue ) {
             $lastDetected = Carbon::parse($issue->last_detected_at);
             if( $lastRun !== 'N/A' ) {
                 $lastRunCarbon = Carbon::parse($lastRun);
@@ -106,9 +102,8 @@ class VerifyCPCPSURLs extends Command
      */
     private function processRecordUrlFields(array $row, int $index): void
     {
-
         $issue = new Issue();
-        $id = $row["id"];
+        $id = $row['id'];
         $subject = $row['Certificate Name'];
         $salesforceRecordID = $row['Salesforce Record ID'];
 
@@ -122,17 +117,23 @@ class VerifyCPCPSURLs extends Command
                 continue; // empty => ignore
             }
 
-            // If multiple URLs are present, they must be separated by "; "
-            $parts = strpos($value, '; ') !== false ? explode('; ', $value) : [$value];
-            $parts = array_map('trim', $parts);
+            if( $field === 'Full CRL Issued By This CA' ) {
+                // Single URL expected
+                $parts = [$value];
+            } else {
+                // Multiple URLs expected, separated by semicolons
+                $parts = array_map('trim', explode(';', $value));
+            }
 
+            // Ensure the field contains only URLs (no extra non-URL content)
             $ua = (string) config('app.http_user_agent', 'CCADBURLMonitor/1.0');
 
             foreach ($parts as $url) {
                 // Validate URL structure and scheme
-                if (!filter_var($url, FILTER_VALIDATE_URL) || !preg_match('/^https?:\/\//i', $url)) {
-                    $this->logFieldError($field, 'Invalid URL format or scheme (must be http/https)', $subject, $salesforceRecordID, $value, $url);
-                    $issue->createOrUpdateError($id, $url, 'Invalid URL format or scheme (must be http/https)', 'CPS: Invalid URL Scheme', false);
+                if (!filter_var($url, FILTER_VALIDATE_URL) || !preg_match('/^http:\/\//i', $url)) {
+                    $this->logFieldError($field, 'Invalid URL format or scheme (must be http)', $subject, $salesforceRecordID, $value, $url);
+                    $issue->createOrUpdateError($id, $url, 'Invalid URL format or scheme (must be http): ' . $url, 'CRL: Invalid URL format or scheme (must be http)', false);
+
                     continue; // move to next URL
                 }
 
@@ -148,13 +149,13 @@ class VerifyCPCPSURLs extends Command
                     ])->timeout(30)->head($url);
                 } catch (\Throwable $e) {
                     $this->logFieldError($field, 'HEAD request failed: ' . $e->getMessage(), $subject, $salesforceRecordID, $value, $url);
-                    $issue->createOrUpdateError($id, $url, 'HEAD request failed: ' . $e->getMessage(), 'CPS: HTTP Request Failed', false);
+                    $issue->createOrUpdateError($id, $url, 'HEAD request failed: ' . $e->getMessage(), 'CRL: HEAD request failed', false);
                     continue;
                 }
 
                 if ($response->status() !== 200) {
                     $this->logFieldError($field, 'Non-200 HTTP status: ' . $response->status(), $subject, $salesforceRecordID, $value, $url);
-                    $issue->createOrUpdateError($id, $url, 'Non-200 HTTP status: ' . $response->status(), 'CPS: Non-200 HTTP status', false);
+                    $issue->createOrUpdateError($id, $url, 'Non-200 HTTP status: ' . $response->status(), 'CRL: Non-200 HTTP status', false);
                     continue;
                 }
 

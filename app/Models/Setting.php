@@ -19,4 +19,31 @@ class Setting extends Model
         $setting->value = now()->toDateTimeString();
         $setting->save();
     }
+
+    public function setLastCPCPSURLCheckNow(): void
+    {
+
+        if($this->where("key", "=", "last_cpcps_url_check")->exists()){
+            $setting = $this->where("key", "=", "last_cpcps_url_check")->first();
+        } else {
+            $setting = new Setting();
+            $setting->key = "last_cpcps_url_check";
+        }
+        $setting->value = now()->toDateTimeString();
+        $setting->save();
+    }
+
+    public function setLastCRLURLCheckNow(): void
+    {
+
+        if($this->where("key", "=", "last_crl_url_check")->exists()){
+            $setting = $this->where("key", "=", "last_crl_url_check")->first();
+        } else {
+            $setting = new Setting();
+            $setting->key = "last_crl_url_check";
+        }
+        $setting->value = now()->toDateTimeString();
+        $setting->save();
+    }
+
 }
