@@ -104,11 +104,11 @@ class VerifyCPCPSURLs extends Command
     /**
      * Inspect URL fields for a single record and validate them.
      */
-    private function processRecordUrlFields(array $row, int $index): void
+    private function processRecordUrlFields(array $row, int $index, string $mode): void
     {
 
         $issue = new Issue();
-        $id = $row["id"];
+        $id = $row['id'] ?? 0;
         $subject = $row['Certificate Name'];
         $salesforceRecordID = $row['Salesforce Record ID'];
 
@@ -132,7 +132,9 @@ class VerifyCPCPSURLs extends Command
                 // Validate URL structure and scheme
                 if (!filter_var($url, FILTER_VALIDATE_URL) || !preg_match('/^https?:\/\//i', $url)) {
                     $this->logFieldError($field, 'Invalid URL format or scheme (must be http/https)', $subject, $salesforceRecordID, $value, $url);
-                    $issue->createOrUpdateError($id, $url, 'Invalid URL format or scheme (must be http/https)', 'CPS: Invalid URL Scheme', false);
+                    if( $mode === 'Integrated' ) {
+                        $issue->createOrUpdateError($id, $url, 'Invalid URL format or scheme (must be http/https)', 'CPS: Invalid URL Scheme', false);
+                    }
                     continue; // move to next URL
                 }
 
@@ -148,13 +150,17 @@ class VerifyCPCPSURLs extends Command
                     ])->timeout(30)->head($url);
                 } catch (\Throwable $e) {
                     $this->logFieldError($field, 'HEAD request failed: ' . $e->getMessage(), $subject, $salesforceRecordID, $value, $url);
-                    $issue->createOrUpdateError($id, $url, 'HEAD request failed: ' . $e->getMessage(), 'CPS: HTTP Request Failed', false);
+                    if( $mode === 'Integrated' ) {
+                        $issue->createOrUpdateError($id, $url, 'HEAD request failed: ' . $e->getMessage(), 'CPS: HTTP Request Failed', false);
+                    }
                     continue;
                 }
 
                 if ($response->status() !== 200) {
                     $this->logFieldError($field, 'Non-200 HTTP status: ' . $response->status(), $subject, $salesforceRecordID, $value, $url);
-                    $issue->createOrUpdateError($id, $url, 'Non-200 HTTP status: ' . $response->status(), 'CPS: Non-200 HTTP status', false);
+                    if( $mode === 'Integrated' ) {
+                        $issue->createOrUpdateError($id, $url, 'Non-200 HTTP status: ' . $response->status(), 'CPS: Non-200 HTTP status', false);
+                    }
                     continue;
                 }
 
