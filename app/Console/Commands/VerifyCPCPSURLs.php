@@ -80,7 +80,7 @@ class VerifyCPCPSURLs extends Command
 
         // Process URL fields for each record
         foreach ($records as $i => $row) {
-            $this->processRecordUrlFields($row, $i + 1);
+            $this->processRecordUrlFields($row, $i + 1, $mode);
         }
 
         $setting = new Setting();
