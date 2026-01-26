@@ -6,11 +6,16 @@ on:
       caowner:
         description: 'CA Owner to verify'
         required: true
-        default: ''
+        default: {{ secrets.CA_OWNER }}
 
 jobs:
-  verify-cpcps-urls:
+  verify-crl-urls:
     runs-on: ubuntu-latest
+    env:
+      LOG_LEVEL: {{ secrets.LOG_LEVEL }}
+      LOG_SLACK_WEBHOOK_URL: {{ secrets.LOG_SLACK_WEBHOOK_URL }}
+      LOG_TEAMS_WEBHOOK_URL: {{ secrets.LOG_TEAMS_WEBHOOK_URL }}
+      LOG_LEVEL: {{ secrets.LOG_LEVEL }}
 
     steps:
       - name: Checkout repository
