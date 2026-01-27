@@ -10,6 +10,8 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schedule;
+use Monolog\Level;
+use Paulgsepulveda\MonologTeamsWorkflow\TeamsWorkflowLogHandler;
 
 class VerifyCRLURLs extends Command
 {
@@ -47,6 +49,7 @@ class VerifyCRLURLs extends Command
      */
     public function handle()
     {
+
         // Early validation: show help if options are invalid or missing
         if ($this->showHelpIfInvalidOptions()) {
             return 0;
@@ -179,7 +182,7 @@ class VerifyCRLURLs extends Command
         $suffix = $url ? " [URL: {$url}]" : '';
         $full = $prefix . $suffix . ' ' . $message;
         $this->error($full);
-        Log::error('VerifyCPCPSURLs: ' . $message, [
+        Log::error('VerifyCRLURLs: ' . $message, [
             'field' => $field,
             'subject' => $subject,
             'recordId' => $ccadbRecordID,

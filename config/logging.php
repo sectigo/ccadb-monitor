@@ -54,7 +54,7 @@ return [
 
         'stack' => [
             'driver' => 'stack',
-            'channels' => explode(',', (string) env('LOG_STACK', 'single')),
+            'channels' => explode(',', (string) env('LOG_STACK', 'teams')),
             'ignore_exceptions' => false,
         ],
 
@@ -80,6 +80,16 @@ return [
             'emoji' => env('LOG_SLACK_EMOJI', ':boom:'),
             'level' => env('LOG_LEVEL', 'critical'),
             'replace_placeholders' => true,
+        ],
+
+        'teams' => [
+            'driver' => 'custom',
+            'via' => \Paulgsepulveda\MonologTeamsWorkflow\TeamsLogChannel::class,
+            'level' => env('LOG_LEVEL', 'critical'),
+            'url' => env('LOG_TEAMS_WEBHOOK_URL'),
+            'source_name' => env('APP_NAME'),
+            'source_url' => env('APP_URL'),
+            'style' => 'card',
         ],
 
         'papertrail' => [

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "05223f6e9c397e19f500ef1c3d7e8d47",
+    "content-hash": "fe3d4cf472ef4ac6bd58a80d7a176c2e",
     "packages": [
         {
             "name": "brick/math",
@@ -2657,6 +2657,46 @@
                 }
             ],
             "time": "2025-11-20T02:34:59+00:00"
+        },
+        {
+            "name": "paulgsepulveda/monolog-teams-workflow",
+            "version": "v1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/paulgsepulveda/monolog-teams-workflow.git",
+                "reference": "37df09a100f7654e2e8e501e56dd18d2e5a58223"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/paulgsepulveda/monolog-teams-workflow/zipball/37df09a100f7654e2e8e501e56dd18d2e5a58223",
+                "reference": "37df09a100f7654e2e8e501e56dd18d2e5a58223",
+                "shasum": ""
+            },
+            "require": {
+                "ext-curl": "*",
+                "ext-json": "*",
+                "monolog/monolog": "^3.3.1",
+                "php": "^8.2"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^11.2"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Paulgsepulveda\\MonologTeamsWorkflow\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "Monolog Handler for sending messages to Microsoft Teams channels using the Workflow webhook",
+            "support": {
+                "issues": "https://github.com/paulgsepulveda/monolog-teams-workflow/issues",
+                "source": "https://github.com/paulgsepulveda/monolog-teams-workflow/tree/v1.0.0"
+            },
+            "time": "2024-07-16T18:37:55+00:00"
         },
         {
             "name": "phpoption/phpoption",

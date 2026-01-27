@@ -35,4 +35,8 @@ return [
         ],
     ],
 
+    'microsoft_teams' => [
+        'webhook_url' => env('LOG_TEAMS_WEBHOOK_URL'),
+    ],
+
 ];
