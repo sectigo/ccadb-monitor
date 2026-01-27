@@ -87,7 +87,7 @@ class VerifyCRLURLs extends Command
 
         if($mode == "Integrated") {
             $setting = new Setting();
-            $setting->setLastCPCPSURLCheckNow();
+            $setting->setLastCRLURLCheckNow();
 
             //Set any CRL URL checks as resolved if they were last detected before the last run
             foreach( Issue::where("issue_type", "LIKE", "CRL: %")->where("is_resolved", "=", false)->get() as $issue ) {

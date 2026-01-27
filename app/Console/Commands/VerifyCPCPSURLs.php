@@ -87,7 +87,7 @@ class VerifyCPCPSURLs extends Command
 
         if($mode == "Integrated") {
             $setting = new Setting();
-            $setting->setLastCRLURLCheckNow();
+            $setting->setLastCPCPSURLCheckNow();
 
             //Set any CPS URL checks as resolved if they were last detected before the last run
             foreach (Issue::where("issue_type", "LIKE", "CPS: %")->where("is_resolved", "=", false)->get() as $issue) {
