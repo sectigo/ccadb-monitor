@@ -41,3 +41,13 @@ Finally, you should set a custom execution schedule for the GitHub Actions to ru
 In integrated mode, you can utilize a pre-built Docker image that includes a WebUI for easier management and monitoring. It already has the standalone scripts integrated and runs these on an hourly schedule. 
 
 Integrated mode also utilizes a database to store historical results and store parts of the CCADB CSV files for faster processing. For additional convenience, a docker-compose.yml file is provided to set up the entire environment quickly.
+
+Make sure to set the appropriate environment variables in the `docker-compose.yml` file, including:
+- LOG_STACK: 'teams' or 'slack' (depending on your logging preference)
+- LOG_SLACK_WEBHOOK_URL: The webhook URL for your Slack logging channel
+- LOG_TEAMS_WEBHOOK_URL: The webhook URL for your Microsoft Teams logging channel
+- LOG_LEVEL: The logging level (e.g., 'info', 'warning', 'error'). "error" is recommended.
+- CA_OWNER: Your CCADB CA Name
+
+In integrated mode, the docker-compose setup will bind container port 80 to host port 8080. You can access the WebUI by navigating to port 8080 of the appropriate hostname in your web browser.
+
