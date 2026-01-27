@@ -9,6 +9,7 @@ use App\Helper\CCADB;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schedule;
 
 class VerifyCRLURLs extends Command
 {
@@ -209,4 +210,5 @@ class VerifyCRLURLs extends Command
 
         return false;
     }
+
 }

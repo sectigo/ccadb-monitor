@@ -1,0 +1,14 @@
+services:
+
+  app:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    restart: unless-stopped
+    container_name: ccadb_monitor
+    ports:
+      - "8080:80"
+    environment:
+      LOG_STACK: "slack"
+      LOG_LEVEL: "debug"
+      CA_OWNER: ""

@@ -9,6 +9,7 @@ use App\Helper\CCADB;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schedule;
 
 class VerifyCPCPSURLs extends Command
 {
@@ -208,4 +209,6 @@ class VerifyCPCPSURLs extends Command
 
         return false;
     }
+
+
 }

@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('ca_certificate_records', function (Blueprint $table) {
             $table->id();
             $table->string('ca_owner', 128)->index();
-            $table->string('ca_name', 128);
+            $table->string('certificate_name', 128);
             $table->string('ccadb_record_id', 128);
             $table->timestamps();
         });

@@ -29,7 +29,6 @@ class RefreshCCADBRecords extends Command
     {
 
         $CCADB = new \App\Helper\CCADB();
-
         try {
             $this->info('Starting CCADB certificate records refresh...');
             $csvContent = $CCADB->getCCADBAllCertificateRecords();
@@ -84,7 +83,7 @@ class RefreshCCADBRecords extends Command
             return 1;
         }
 
-
+        return 0;
 
     }
 }
