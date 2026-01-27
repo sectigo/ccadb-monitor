@@ -76,29 +76,31 @@ class VerifyCPCPSURLs extends Command
         $count = count($records);
         $this->info("Found {$count} certificate record(s) for owner '{$caOwner}'.");
 
-        //If available, discover the last CPS URL check time
-        $lastRun = Setting::where("key", "=", "last_cpcps_url_check")->first()->value ?? 'N/A';
-
+        if($mode == "Integrated") {
+            //If available, discover the last CPS URL check time
+            $lastRun = Setting::where("key", "=", "last_cpcps_url_check")->first()->value ?? 'N/A';
+        }
         // Process URL fields for each record
         foreach ($records as $i => $row) {
             $this->processRecordUrlFields($row, $i + 1, $mode);
         }
 
-        $setting = new Setting();
-        $setting->setLastCRLURLCheckNow();
+        if($mode == "Integrated") {
+            $setting = new Setting();
+            $setting->setLastCRLURLCheckNow();
 
-        //Set any CPS URL checks as resolved if they were last detected before the last run
-        foreach( Issue::where("issue_type", "LIKE", "CPS: %")->where("is_resolved", "=", false)->get() as $issue ) {
-            $lastDetected = Carbon::parse($issue->last_detected_at);
-            if( $lastRun !== 'N/A' ) {
-                $lastRunCarbon = Carbon::parse($lastRun);
-                if( $lastDetected->lessThan($lastRunCarbon) ) {
-                    $issue->is_resolved = true;
-                    $issue->save();
+            //Set any CPS URL checks as resolved if they were last detected before the last run
+            foreach (Issue::where("issue_type", "LIKE", "CPS: %")->where("is_resolved", "=", false)->get() as $issue) {
+                $lastDetected = Carbon::parse($issue->last_detected_at);
+                if ($lastRun !== 'N/A') {
+                    $lastRunCarbon = Carbon::parse($lastRun);
+                    if ($lastDetected->lessThan($lastRunCarbon)) {
+                        $issue->is_resolved = true;
+                        $issue->save();
+                    }
                 }
             }
         }
-
         return 0;
     }
 

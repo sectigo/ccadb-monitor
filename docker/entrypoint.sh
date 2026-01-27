@@ -12,7 +12,9 @@ if [ ! -f "/app/db.sqlite" ]; then
 fi
 
 # Run PHP preparation commands
-php artisan migrate
+php artisan migrate --force
+
+php artisan key:generate
 
 # Set permissions for logging folder
 chmod -R 700 /app/storage

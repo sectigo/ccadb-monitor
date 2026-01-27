@@ -13,6 +13,7 @@ RUN \
   && \
   apt-get install -y \
     zlib1g-dev \
+    gettext-base \
     openssl \
     libpng-dev \
     sqlite3 \
