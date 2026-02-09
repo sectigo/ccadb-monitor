@@ -116,11 +116,11 @@ class VerifyCRLURLs extends Command
 
         foreach (self::URL_FIELDS as $field) {
             if (!array_key_exists($field, $row)) {
-                continue; // field not present in this CSV variant
+                $this->error("Field '{$field}' is relied upon but not present in the CSV.");
             }
             $raw = $row[$field];
             $value = is_string($raw) ? trim($raw) : trim((string) $raw);
-            if ($value === '') {
+            if ($value == '') {
                 continue; // empty => ignore
             }
 
