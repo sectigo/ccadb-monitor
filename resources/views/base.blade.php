@@ -107,7 +107,34 @@
         .kpi-title.bad  { color: var(--badText); }
         .card.kpi {
             background: linear-gradient(180deg, var(--panel) 0%, var(--panel2) 100%);
+            position: relative;
         }
+
+        .card.kpi .recheck-btn {
+            position: absolute;
+            top: 12px;
+            right: 14px;
+
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.03em;
+
+            padding: 4px 10px;
+            border-radius: 999px;
+
+            color: #f8fafc;
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+
+            text-decoration: none;
+            opacity: 0.85;
+        }
+
+        .card.kpi .recheck-btn:hover {
+            opacity: 1;
+            background: rgba(255, 255, 255, 0.2);
+        }
+
 
         /* KPI OK = green background */
         .card.kpi.good {
@@ -155,6 +182,32 @@
             font-weight: 750;
         }
         .btn:hover { background: var(--btnHover); }
+
+        .notice {
+            margin-bottom: 14px;
+            padding: 12px 14px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 650;
+
+            display: flex;
+            align-items: center;
+            gap: 10px;
+
+            border: 1px solid var(--line);
+            box-shadow: var(--shadow);
+        }
+
+        .notice.success {
+            background: linear-gradient(
+                180deg,
+                rgba(74, 222, 128, 0.22),
+                rgba(74, 222, 128, 0.12)
+            );
+            border-color: rgba(74, 222, 128, 0.35);
+            color: var(--okText);
+        }
+
 
         table {
             margin-top: 12px;
@@ -246,21 +299,34 @@
 </div>
 
 <div class="container">
-
+    @if (session('status'))
+        <div class="notice success">
+            {{ session('status') }}
+        </div>
+    @endif
     <div class="grid">
         <div class="card kpi @if($totalCaRecords > 0 && $ccadbLastRefresh !== 'N/A' && \Carbon\Carbon::parse($ccadbLastRefresh)->isAfter(\Carbon\Carbon::now()->subDay())) good @else bad @endif">
+            <a href="/recheck/ccadb" class="recheck-btn">
+                Recheck
+            </a>
             <h3>Total CA Records</h3>
             <div class="value">{{$totalCaRecords}}</div>
             <div class="sub">Last Refresh: {{ $ccadbLastRefresh }}</div>
         </div>
 
         <div class="card kpi @if($cpsErrors > 0) bad @else good @endif">
+            <a href="/recheck/cps" class="recheck-btn">
+                Recheck
+            </a>
             <h3>CPS Errors detected</h3>
             <div class="value">{{$cpsErrors}}</div>
             <div class="sub">Last Run: {{ $cpsUrlLastCheck }}</div>
         </div>
 
         <div class="card kpi @if($crlErrors > 0) bad @else good @endif">
+            <a href="/recheck/crl" class="recheck-btn">
+                Recheck
+            </a>
             <h3>CRL Errors detected</h3>
             <div class="value">{{$crlErrors}}</div>
             <div class="sub">Last Run: {{ $crlUrlLastCheck }}</div>
@@ -317,6 +383,12 @@
             r.style.display = ca.includes(q) ? '' : 'none';
         }
     }
+
+        setTimeout(() => {
+        const n = document.querySelector('.notice');
+        if (n) n.style.display = 'none';
+    }, 10000);
+
 </script>
 
 </body>

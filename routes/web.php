@@ -15,3 +15,32 @@ Route::get('/', function () {
 
     ]);
 });
+
+Route::get('/recheck/ccadb', function () {
+    \App\Jobs\RefreshCcadb::dispatch();
+
+    return back()->with(
+        'status',
+        'CCADB refresh queued. This may take several minutes.'
+    );
+})->name('recheck.ccadb');
+
+Route::get('/recheck/cps', function () {
+    \App\Jobs\VerifyCpsUrls::dispatch();
+
+    return back()->with(
+        'status',
+        'CPS URL verification queued.'
+    );
+})->name('recheck.cps');
+
+
+Route::get('/recheck/crl', function () {
+    \App\Jobs\VerifyCrlUrls::dispatch();
+
+    return back()->with(
+        'status',
+        'CRL URL re-check queued. This may take several minutes.'
+    );
+})->name('recheck.crl');
+

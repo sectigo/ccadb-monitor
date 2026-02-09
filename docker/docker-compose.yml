@@ -12,6 +12,6 @@ services:
       LOG_STACK: "slack"
       LOG_LEVEL: "debug"
       LOG_SLACK_WEBHOOK_URL: ""
-      LOG_TEAMS_WEBHOOK_URL: """
+      LOG_TEAMS_WEBHOOK_URL: ""
       CA_OWNER: ""
 

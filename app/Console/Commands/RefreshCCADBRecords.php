@@ -75,6 +75,13 @@ class RefreshCCADBRecords extends Command
                 }
             }
 
+            //Remove records not updated in this run (i.e. removed from CCADB) based on their updated_at timestamp. If the record was not updated in this run, it means it was not present in the CCADB export and should be removed from the local database.
+            $staleRecords = CaCertificateRecord::where('updated_at', '<', now()->subMinutes(30))->get(); // Assuming the command should complete within 30 minutes
+            foreach ($staleRecords as $staleRecord) {
+                $this->info("Removing stale record with Salesforce ID: " . $staleRecord->ccadb_record_id);
+                $staleRecord->delete();
+            }
+
             $setting = new Setting();
             $setting->setLastCCADBRefreshNow();
             $this->info('CCADB certificate records have been successfully refreshed.');
