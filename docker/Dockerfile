@@ -1,5 +1,8 @@
 FROM php:8.5-fpm
 
+LABEL org.opencontainers.image.source="https://github.com/sectigo/ccadb-monitor"
+LABEL org.opencontainers.image.description="CCADB Monitor"
+
 ARG \
   DEBIAN_FRONTEND=noninteractive
 
@@ -21,10 +24,10 @@ RUN \
     libsqlite3-dev \
     pkg-config \
     libonig-dev \
-    supervisor \
-  && \
+    supervisor
+
   # Install gd
-  docker-php-ext-configure gd \
+  RUN docker-php-ext-configure gd \
   && docker-php-ext-install gd \
   && docker-php-ext-enable gd \
   && docker-php-ext-configure bcmath \
@@ -37,19 +40,20 @@ RUN \
   # Install mbstring
   && docker-php-ext-configure mbstring \
   && docker-php-ext-install mbstring \
-  && docker-php-ext-enable mbstring \
+  && docker-php-ext-enable mbstring
   # Tweak php-fpm config
-  && sed -i \
+
+RUN sed -i \
     -e "s/;listen.mode = 0660/listen.mode = 0666/g" \
     -e "s/;listen = 127.0.0.1:9000/listen = \/var\/run\/php-fpm.sock/g" \
-    /usr/local/etc/php-fpm.d/www.conf \
+    /usr/local/etc/php-fpm.d/www.conf
   # Install vendor packages
-  && cd /app \
+RUN cd /app \
   && php composer.phar install \
   # Set permissions
-  && chown -R www-data:www-data /app \
+  && chown -R www-data:www-data /app
   # Cleanup
-  && apt-get autoremove -y \
+RUN  apt-get autoremove -y \
   && apt-get clean \
   && rm -rf \
     /tmp/* \
