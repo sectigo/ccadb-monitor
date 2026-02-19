@@ -1,9 +1,7 @@
 services:
 
   app:
-    build:
-      context: ..
-      dockerfile: docker/Dockerfile
+    image: ghcr.io/sectigo/ccadb-monitor:latest
     restart: unless-stopped
     container_name: ccadb_monitor
     ports:

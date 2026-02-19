@@ -89,7 +89,7 @@ return [
             'url' => env('LOG_TEAMS_WEBHOOK_URL'),
             'source_name' => env('APP_NAME'),
             'source_url' => env('APP_URL'),
-            'style' => 'card',
+            'style' => 'text',
         ],
 
         'papertrail' => [
