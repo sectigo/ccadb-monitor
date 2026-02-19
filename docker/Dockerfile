@@ -26,6 +26,7 @@ RUN \
       libonig-dev \
       supervisor \
       git \
+      libzip-dev \
       unzip \
       zip
 
