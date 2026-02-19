@@ -15,16 +15,19 @@ RUN \
   && apt-get -y upgrade \
   && \
   apt-get install -y \
-    zlib1g-dev \
-    gettext-base \
-    openssl \
-    libpng-dev \
-    sqlite3 \
-    nginx \
-    libsqlite3-dev \
-    pkg-config \
-    libonig-dev \
-    supervisor
+      zlib1g-dev \
+      gettext-base \
+      openssl \
+      libpng-dev \
+      sqlite3 \
+      nginx \
+      libsqlite3-dev \
+      pkg-config \
+      libonig-dev \
+      supervisor \
+      git \
+      unzip \
+      zip
 
   # Install gd
   RUN docker-php-ext-configure gd \
@@ -41,6 +44,8 @@ RUN \
   && docker-php-ext-configure mbstring \
   && docker-php-ext-install mbstring \
   && docker-php-ext-enable mbstring
+
+RUN docker-php-ext-install zip
   # Tweak php-fpm config
 
 RUN sed -i \
