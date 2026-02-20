@@ -136,9 +136,15 @@ class VerifyCRLURLs extends Command
             $ua = (string) config('app.http_user_agent', 'CCADBURLMonitor/1.0');
 
             foreach ($parts as $url) {
+                if($field === 'JSON Array of Partitioned CRLs' && $value == '[""]') {
+                    //Continue if the JSON array field is empty, as that is allowed (it means no CRL have yet been disclosed)
+                    continue;
+                }
                 // Validate URL structure and scheme
                 if (!filter_var($url, FILTER_VALIDATE_URL) || !preg_match('/^http:\/\//i', $url)) {
+
                     $this->logFieldError($field, 'Invalid URL format or scheme (must be http)', $subject, $salesforceRecordID, $value, $url);
+
                     if( $mode === 'Integrated' ) {
                         $issue->createOrUpdateError($id, $url, 'Invalid URL format or scheme (must be http): ' . $url, 'CRL: Invalid URL format or scheme (must be http)', false);
                     }
