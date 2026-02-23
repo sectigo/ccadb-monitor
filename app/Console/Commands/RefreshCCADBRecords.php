@@ -64,6 +64,7 @@ class RefreshCCADBRecords extends Command
                 $caRecord->certificate_name = $record['Certificate Name'];
                 $caRecord->save();
 
+                $caRecord->touch();
                 //foreach additional column in the CSV, update or create a CaCertificateRecordDetail
                 foreach ($record as $field => $value) {
                     if (in_array($field, ['Salesforce Record ID', 'CA Owner', 'Certificate Name'])) {
@@ -73,18 +74,23 @@ class RefreshCCADBRecords extends Command
                     $detail->value = $value;
                     $detail->save();
                 }
+
             }
 
-            //Remove records not updated in this run (i.e. removed from CCADB) based on their updated_at timestamp. If the record was not updated in this run, it means it was not present in the CCADB export and should be removed from the local database.
-            $staleRecords = CaCertificateRecord::where('updated_at', '<', now()->subMinutes(30))->get(); // Assuming the command should complete within 30 minutes
-            foreach ($staleRecords as $staleRecord) {
-                $this->info("Removing stale record with Salesforce ID: " . $staleRecord->ccadb_record_id);
-                $staleRecord->delete();
-            }
+            if(!empty($records)){
+                //Remove records not updated in this run (i.e. removed from CCADB) based on their updated_at timestamp. If the record was not updated in this run, it means it was not present in the CCADB export and should be removed from the local database.
+                $staleRecords = CaCertificateRecord::where('updated_at', '<', now()->subMinutes(55))->get(); // Assuming the command should complete within 30 minutes
+                foreach ($staleRecords as $staleRecord) {
+                    $this->info("Removing stale record with Salesforce ID: " . $staleRecord->ccadb_record_id);
+                    $staleRecord->delete();
+                }
 
+            }
             $setting = new Setting();
             $setting->setLastCCADBRefreshNow();
             $this->info('CCADB certificate records have been successfully refreshed.');
+
+
         } catch (\RuntimeException $e) {
             $this->error('Error refreshing CCADB records: ' . $e->getMessage());
             return 1;
