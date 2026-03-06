@@ -11,5 +11,12 @@ services:
       LOG_LEVEL: "debug"
       LOG_SLACK_WEBHOOK_URL: ""
       LOG_TEAMS_WEBHOOK_URL: ""
+      DB_CONNECTION: "sqlite"
+      DB_DATABASE: "db.sqlite"
+      DB_HOST: ""
+      DB_PORT: ""
+      DB_USERNAME: ""
+      DB_PASSWORD: ""
       CA_OWNER: ""
+
 
