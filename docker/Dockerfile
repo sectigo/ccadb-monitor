@@ -28,6 +28,7 @@ RUN \
       git \
       libzip-dev \
       unzip \
+      libpq-dev \
       zip
 
   # Install gd
