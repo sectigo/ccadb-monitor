@@ -38,6 +38,10 @@ RUN \
   && docker-php-ext-install bcmath \
   && docker-php-ext-enable bcmath \
   # Install pgsql
+  && docker-php-ext-configure pdo_pgsql \
+  && docker-php-ext-install pdo_pgsql \
+  && docker-php-ext-enable pdo_pgsql \
+  # Install sqlite
   && docker-php-ext-configure pdo_sqlite \
   && docker-php-ext-install pdo_sqlite \
   && docker-php-ext-enable pdo_sqlite \
