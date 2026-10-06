@@ -191,12 +191,11 @@ class VerifyCRLURLs extends Command
         $suffix = $url ? " [URL: {$url}]" : '';
         $full = $prefix . $suffix . ' ' . $message;
         $this->error($full);
+        // Note: Avoid including raw/potentially malformed URLs in log context to prevent cURL errors in webhook handlers
         Log::error('VerifyCRLURLs: ' . $message, [
             'field' => $field,
             'subject' => $subject,
             'recordId' => $ccadbRecordID,
-            'raw' => $rawValue,
-            'url' => $url,
         ]);
     }
 
